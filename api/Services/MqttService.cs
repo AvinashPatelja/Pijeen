@@ -1,5 +1,6 @@
 using MQTTnet;
 using MQTTnet.Client;
+using MQTTnet.Server;
 using System.Text.Json;
 using Pijeen.API.Data;
 using Pijeen.API.Models;
@@ -34,7 +35,7 @@ public class MqttService : IMqttService, IDisposable
     {
         try
         {
-            var factory = new MqttClientFactory();
+            var factory = new MqttFactory();
             _mqttClient = factory.CreateMqttClient();
 
             var broker = _configuration["Mqtt:Broker"] ?? "broker.emqx.io";

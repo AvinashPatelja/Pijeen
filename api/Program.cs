@@ -4,7 +4,7 @@ using System.Text;
 using Pijeen.API.Data;
 using Pijeen.API.Services;
 
-var builder = WebApplicationBuilder.CreateBuilder(args);
+var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container
 builder.Services.AddControllers();

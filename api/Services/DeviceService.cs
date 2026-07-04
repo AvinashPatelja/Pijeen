@@ -58,7 +58,7 @@ public class DeviceService : IDeviceService
             IMEI = imei,
             DeviceType = deviceType,
             Status = "OFF",
-            Valve = deviceType == "FC" ? 0 : null,
+            Valve = deviceType == "FC" ? 0 : 0,
             LastUpdatedAt = DateTime.UtcNow
         };
 
@@ -71,7 +71,7 @@ public class DeviceService : IDeviceService
             IMEI = imei,
             DeviceType = deviceType,
             Status = "OFF",
-            Valve = deviceType == "FC" ? 0 : null,
+            Valve = deviceType == "FC" ? 0 : 0,
             ActionType = "System",
             ActionBy = userId,
             CreatedAt = DateTime.UtcNow
@@ -120,7 +120,7 @@ public class DeviceService : IDeviceService
             {
                 deviceType = device.DeviceType,
                 imei = device.IMEI,
-                Valve = device.DeviceType == "FC" ? 0 : null,
+                Valve = device.DeviceType == "FC" ? 0 : 0,
                 status = status.ToUpper()
             };
 
@@ -134,7 +134,7 @@ public class DeviceService : IDeviceService
                 IMEI = device.IMEI,
                 DeviceType = device.DeviceType,
                 Status = status.ToUpper(),
-                Valve = device.DeviceType == "FC" ? 0 : null,
+                Valve = device.DeviceType == "FC" ? 0 : 0,
                 ActionType = "UserCommand",
                 ActionBy = userId,
                 CreatedAt = DateTime.UtcNow
