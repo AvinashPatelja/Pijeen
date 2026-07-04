@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
+using Pijeen.API.Models;
 using Pijeen.API.Models.DTOs;
 using Pijeen.API.Services;
 
