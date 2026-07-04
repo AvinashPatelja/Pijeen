@@ -1,0 +1,103 @@
+Login Page
+
+Registration -> Farmer / Panchayath Member / Admin
+
+
+Mapping Device:
+
+Add Field Controller
+Add Gate Controller
+Add MASTER CONTROLLER
+
+Field Controller:
+-----------------------------------------------
+Add IMEI for Gate Controller / Select IMEI:Select Field Controller(IMEI) if more than 1.
+
+IMEI -> Redirect to Dashboard(FC)
+
+Dashboard(FC) - Display below data:
+
+On / OFF
+
+When On / Off pressed: API publish below data (Latest data / empty)
+
+topic name : devices/{IMEI}/status
+
+{  
+"deviceType": "FC",  
+"imei": "123456789",  
+"Valve": 0,         0 when devType: FC
+"valveStatus": 0,   0 when devType: FC
+"motorStatus": "ON" 
+}
+
+-> HW publish below details -> Need to capture/update in DB
+
+topic name : devices/{IMEI}/fc/status
+
+{
+  "deviceType": "FC",
+  "imei": "123456789",
+  "motorStatus": "ON",
+  "Voltage": 300,
+  "Ampere": 20,
+  "Power": 6000,
+  "rssi" : 19,
+  "faultReason": "NONE"
+}
+
+-> Then refresh the UI with latest details
+-------------------------------------------------
+-------------------------------------------------
+
+Gate Controller:
+-------------------------------------------------
+Add IMEI for Gate Controller / Select IMEI: Select Field Controller(IMEI) if more than 1.
+
+Relay Type: 1GV / 2GV / 4GV Respectively (G1 / G2,3 / G4,5,6,7)
+
+IMEI -> Redirect to Dashboard(FC)
+
+Dashboard(FC) - Display below data:
+
+Open / Close
+
+When Open / Close pressed: API publish below data (Latest data / empty)
+
+topic name : devices/{IMEI}/status
+
+{
+  "deviceType": "GC",
+  "imei": "123456789",
+  "Valve": "G1",
+  "valveStatus": "ON",
+  "motorStatus": 0
+}
+
+-> HW publish below details -> Need to capture/update in DB
+
+
+topic name : devices/{IMEI}/gc/status
+
+{
+  "deviceType": "GC",
+  "imei": "123456789",
+  "BatVoltage": 12.1,
+  "rssi": 19,
+  "Valve": "G1",
+  "valveStatus": "ON"
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
