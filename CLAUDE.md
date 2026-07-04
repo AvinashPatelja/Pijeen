@@ -1,7 +1,11 @@
-# Pijeen - Hardware Control System
+# CLAUDE.md
+
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
 ## Project Overview
-Pijeen is a responsive web application for communicating with hardware devices (Field Controller, Gate Controller, Master Controller) using MQTT protocol. It provides real-time monitoring and control of IoT devices through an intuitive web interface.
+Pijeen is a responsive web application for IoT hardware device control (Field Controller, Gate Controller, Master Controller) via MQTT. Users register/login, then manage and monitor devices through a real-time dashboard with On/Off controls and live telemetry (Voltage, Ampere, RSSI, Fault status).
+
+**Live Connection**: Users can trigger device actions (e.g., turn on motor) → API publishes to MQTT → Device responds with telemetry → API updates DeviceLive/AuditLog → UI refreshes in real-time.
 
 ## Tech Stack
 
@@ -166,42 +170,115 @@ Pijeen/
 REACT_APP_API_URL=http://localhost:5000/api
 ```
 
-## Setup Instructions
+## Development Commands
 
-### Backend Setup
+### Backend (.NET Core)
 ```bash
 cd api
-dotnet restore
-dotnet ef database update  # Apply migrations
+
+# Build & run locally
+dotnet build
 dotnet run
+
+# Entity Framework migrations (after schema changes)
+dotnet ef migrations add MigrationName
+dotnet ef database update
+
+# Restore packages
+dotnet restore
 ```
 
-### Frontend Setup
+### Frontend (React)
 ```bash
 cd client
+
+# Install dependencies
 npm install
+
+# Development server (http://localhost:3000)
 npm start
+
+# Build for production
+npm run build
+
+# Run tests
+npm test
 ```
 
-### Database Setup
-Run the SQL scripts in `database/01_CreateTables.sql` on the MS-SQL database.
+### Database
+```bash
+# Execute on SQL Server (SQL Server Management Studio or sqlcmd)
+# Update connection string in api/appsettings.json first
+sqlcmd -S server_name -U admin -P password -i database/01_CreateTables.sql
+```
+
+## Development Workflow
+
+### Adding a New Device Endpoint
+1. Create DTO in `api/Models/DTOs/` (e.g., `AddDeviceRequest.cs`)
+2. Add service method in `api/Services/DeviceService.cs`
+3. Create controller action in `api/Controllers/DeviceController.cs`
+4. Call service, return `Ok()` or `BadRequest()` with response
+5. Test via Swagger UI at `http://localhost:5000/swagger`
+
+### Adding a New React Page
+1. Create component in `src/pages/`
+2. Add route in `App.tsx` using `<Route path="/path" element={<Component />} />`
+3. If protected, wrap with `<PrivateRoute>` component
+4. Use `apiClient` from `services/api.ts` for API calls
+5. Store auth token in localStorage automatically
+
+### Adding MQTT Functionality
+- Create `MqttService` in `api/Services/` (singleton)
+- Wire up in `Program.cs` with `services.AddSingleton<IMqttService, MqttService>()`
+- Inject into controller/service that needs MQTT publish/subscribe
+- Handle incoming MQTT messages → update DeviceLive & AuditLog tables
+
+## Architecture & Data Flow
+
+### Authentication Flow
+1. **Register**: User submits username/password/email/phone → `AuthService.RegisterAsync()` → Hash password with BCrypt → Save to Users table → Generate JWT token → Return to frontend
+2. **Login**: Username/password → `AuthService.LoginAsync()` → Verify BCrypt hash → Generate JWT → Frontend stores in localStorage
+3. **Protected Routes**: React `<PrivateRoute>` checks for token, Axios interceptor adds token to all requests as `Authorization: Bearer <token>`
+
+### Device Control Flow
+1. **Add Device**: User enters IMEI → `DeviceController.AddDevice()` → Create Devices record → Optionally publish initial MQTT command
+2. **Control Device**: User clicks On/Off → `DeviceController.ControlDevice()` → Publish to MQTT `device/{IMEI}/fc/status` → Log action to AuditLog
+3. **Hardware Response**: Device publishes to MQTT `devices/{IMEI}/fc/status` → `MqttService` receives → Update DeviceLive table → Trigger UI refresh (polling or WebSocket in future)
+
+### Key Services
+- **AuthService** (`api/Services/AuthService.cs`): User registration/login, password hashing
+- **MqttService** (to be created): MQTT broker connection, publish/subscribe, message handling
+- **DeviceService** (to be created): Device CRUD, device status management
+- **apiClient** (`client/src/services/api.ts`): Axios wrapper with JWT token injection
+
+### Database Constraints
+- `Users.Username` - UNIQUE
+- `Devices.IMEI` - UNIQUE per user
+- `DeviceLive.IMEI` - UNIQUE (one live record per device)
+- Foreign keys cascade delete for cleanup
 
 ## User Types
 - **Farmer** - Regular user who owns/operates devices
 - **PanchayathMember** - Administrative user at panchayath level
 - **Admin** - System administrator (internal only, not shown in registration)
 
-## Security Notes
-- Passwords are hashed using BCrypt
-- JWT tokens expire after 24 hours (configurable)
-- API requires Bearer token for authenticated endpoints
-- CORS is enabled for frontend origin only
-- SQL Server uses encrypted connection string
+## Security
+- Passwords hashed with BCrypt (never stored plain text)
+- JWT tokens expire after 24 hours
+- Frontend token in localStorage (consider httpOnly cookies in production)
+- MQTT broker IP/port in appsettings.json (no credentials exposed in code)
+
+## Deployment Considerations
+- Set strong JWT secret in production appsettings
+- Use HTTPS in production
+- SQL Server connection string should use Windows auth or encrypted passwords
+- MQTT broker credentials (if required) should be in environment variables
+- React env vars loaded from `.env` file (never commit sensitive vars)
 
 ## Next Steps
-1. Implement Field Controller registration with IMEI input
-2. Create MQTT service for device communication
-3. Build device control UI with On/Off toggle
-4. Implement real-time data updates with signal strength
-5. Add data visualization and charts
-6. Implement Gate Controller and Master Controller features
+1. Create `MqttService` for broker communication
+2. Create `DeviceService` and `DeviceController` for device management
+3. Implement Field Controller (FC) add/control UI with IMEI input
+4. Add real-time device data polling/display
+5. Extend for Gate Controller (GC) and Master Controller (MC) device types
