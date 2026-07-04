@@ -1,7 +1,8 @@
 {
   "permissions": {
     "allow": [
-      "PowerShell(curl *)"
+      "PowerShell(curl *)",
+      "PowerShell(& \"C:\\\\Projects\\\\Pijeen\\\\start-servers.ps1\")"
     ]
   }
 }
