@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import FieldController from './FieldController';
 
 const Dashboard: React.FC = () => {
   const navigate = useNavigate();
   const user = JSON.parse(localStorage.getItem('user') || '{}');
-  const [activeMenu, setActiveMenu] = useState('overview');
+  const [activeMenu, setActiveMenu] = useState('field-controller');
 
   const handleLogout = () => {
     localStorage.removeItem('token');
@@ -73,38 +74,25 @@ const Dashboard: React.FC = () => {
 
         {/* Main Content */}
         <main className="flex-1 p-8">
-          {activeMenu === 'field-controller' && (
-            <div className="bg-white rounded-lg shadow-lg p-8">
-              <h2 className="text-2xl font-bold text-gray-800 mb-6">Field Controller</h2>
-              <p className="text-gray-600 mb-6">
-                Manage and monitor your field controllers here. Add new devices, control their status, and view real-time data.
-              </p>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-blue-500 cursor-pointer transition">
-                  <div className="text-4xl mb-4">➕</div>
-                  <h3 className="text-lg font-semibold text-gray-700">Add Field Controller</h3>
-                  <p className="text-gray-500 text-sm mt-2">Register a new device using IMEI</p>
-                </div>
-              </div>
-
-              <p className="text-sm text-gray-500 mt-8">
-                Feature coming soon - Add and manage your devices here
-              </p>
-            </div>
-          )}
+          {activeMenu === 'field-controller' && <FieldController />}
 
           {activeMenu === 'gate-controller' && (
-            <div className="bg-white rounded-lg shadow-lg p-8">
-              <h2 className="text-2xl font-bold text-gray-800 mb-6">Gate Controller</h2>
-              <p className="text-gray-600">Gate Controller feature coming soon...</p>
+            <div>
+              <h2 className="text-3xl font-bold text-gray-800 mb-6">Gate Controller</h2>
+              <div className="bg-gray-100 rounded-lg p-12 text-center">
+                <div className="text-6xl mb-4">🚪</div>
+                <p className="text-gray-600 text-lg">Gate Controller feature coming soon...</p>
+              </div>
             </div>
           )}
 
           {activeMenu === 'master-controller' && (
-            <div className="bg-white rounded-lg shadow-lg p-8">
-              <h2 className="text-2xl font-bold text-gray-800 mb-6">Master Controller</h2>
-              <p className="text-gray-600">Master Controller feature coming soon...</p>
+            <div>
+              <h2 className="text-3xl font-bold text-gray-800 mb-6">Master Controller</h2>
+              <div className="bg-gray-100 rounded-lg p-12 text-center">
+                <div className="text-6xl mb-4">⚙️</div>
+                <p className="text-gray-600 text-lg">Master Controller feature coming soon...</p>
+              </div>
             </div>
           )}
         </main>
