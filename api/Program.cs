@@ -28,6 +28,8 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 
 // Add Services
 builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddSingleton<IMqttService, MqttService>();
+builder.Services.AddScoped<IDeviceService, DeviceService>();
 
 // Add JWT Authentication
 var jwtSecret = builder.Configuration["Jwt:Secret"];
@@ -73,6 +75,15 @@ using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
     db.Database.Migrate();
+
+    // Initialize MQTT service
+    var mqttService = scope.ServiceProvider.GetRequiredService<IMqttService>();
+    await mqttService.ConnectAsync();
+
+    // Subscribe to device topics
+    await mqttService.SubscribeAsync("devices/+/fc/status");
+    await mqttService.SubscribeAsync("devices/+/gc/status");
+    await mqttService.SubscribeAsync("devices/+/mc/status");
 }
 
 app.Run();
